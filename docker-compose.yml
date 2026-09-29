@@ -2,6 +2,7 @@ services:
   db:
     image: postgres:16-alpine
     container_name: isp-customers-db
+    restart: unless-stopped
     environment:
       POSTGRES_DB: isp_customers
       POSTGRES_USER: isp_user
@@ -19,6 +20,7 @@ services:
   app:
     build: .
     container_name: isp-customers-api
+    restart: unless-stopped
     depends_on:
       db:
         condition: service_healthy
