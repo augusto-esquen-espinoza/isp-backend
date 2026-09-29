@@ -112,6 +112,59 @@ Todas las variables tienen valores por defecto para desarrollo local:
 | `DB_PASSWORD` | Contraseña de la base de datos | `isp_pass` |
 | `SERVER_PORT` | Puerto HTTP | `8080` |
 
+## Migraciones
+
+El esquema se versiona con Flyway en `src/main/resources/db/migration`. La
+aplicación aplica las migraciones pendientes automáticamente al iniciar.
+
+Para aplicar **solo las migraciones** sin reiniciar la aplicación (por ejemplo,
+tras agregar un nuevo archivo `V2__...sql`), tienes dos opciones.
+
+### Con Java instalado (Maven Wrapper)
+
+```bash
+# Linux/macOS
+./mvnw flyway:migrate
+
+# Windows
+.\mvnw.cmd flyway:migrate
+```
+
+### Sin Java local (Docker)
+
+Si no tienes Java en la máquina pero sí Docker, usa el servicio `migrate`
+(definido con `profiles` en `docker-compose.yml`):
+
+```bash
+docker compose up -d db
+docker compose --profile tools run --rm migrate
+```
+
+Para otro objetivo de Flyway, sobreescribe el comando:
+
+```bash
+docker compose --profile tools run --rm migrate mvn -B flyway:info "-Ddb.url=jdbc:postgresql://db:5432/isp_customers"
+```
+
+Otros comandos útiles (con Maven local):
+
+| Comando | Descripción |
+| --- | --- |
+| `./mvnw flyway:info` | Muestra las migraciones aplicadas y pendientes. |
+| `./mvnw flyway:migrate` | Aplica las migraciones pendientes. |
+| `./mvnw flyway:validate` | Valida que el historial coincida con los archivos. |
+| `./mvnw flyway:clean` | Elimina los objetos del esquema (usar con cuidado). |
+
+Por defecto apunta a `jdbc:postgresql://localhost:5432/isp_customers`. Puedes
+apuntar a otra base de datos sin tocar el `pom.xml`:
+
+```bash
+./mvnw flyway:migrate -Ddb.url=jdbc:postgresql://localhost:5432/otra_bd -Ddb.user=usuario -Ddb.password=clave
+```
+
+> La base de datos debe existir: Flyway crea las tablas dentro de ella, no la
+> base de datos en sí.
+
 ## API REST
 
 Base URL: `http://localhost:8080`

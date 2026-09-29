@@ -22,6 +22,8 @@ gestión de clientes y del cálculo de indicadores de natalidad.
 | Compilar | `./mvnw clean compile` |
 | Ejecutar | `./mvnw spring-boot:run` |
 | Tests | `./mvnw test` |
+| Migraciones (sin reiniciar la app) | `./mvnw flyway:migrate` |
+| Migraciones sin Java local (Docker) | `docker compose --profile tools run --rm migrate` |
 | Empaquetar | `./mvnw clean package` |
 | Levantar DB + API | `docker compose up --build` |
 

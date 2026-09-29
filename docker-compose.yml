@@ -29,5 +29,31 @@ services:
     ports:
       - "8080:8080"
 
+  # Runs only the database migrations without restarting the API.
+  # Usage: docker compose --profile tools run --rm migrate
+  # Other Flyway goals:
+  #   docker compose --profile tools run --rm migrate mvn -B flyway:info \
+  #     -Ddb.url=jdbc:postgresql://db:5432/isp_customers
+  migrate:
+    image: maven:3.9-eclipse-temurin-17
+    profiles: ["tools"]
+    working_dir: /app
+    volumes:
+      - .:/app
+      - isp-maven-repo:/root/.m2
+    depends_on:
+      db:
+        condition: service_healthy
+    command:
+      - mvn
+      - -B
+      - -ntp
+      - flyway:migrate
+      - -Ddb.url=jdbc:postgresql://db:5432/isp_customers
+      - -Ddb.user=isp_user
+      - -Ddb.password=isp_pass
+
 volumes:
   isp-customers-data:
+  isp-maven-repo:
+
