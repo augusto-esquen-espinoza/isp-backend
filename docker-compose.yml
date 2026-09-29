@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: isp-customers-db
+    environment:
+      POSTGRES_DB: isp_customers
+      POSTGRES_USER: isp_user
+      POSTGRES_PASSWORD: isp_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - isp-customers-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isp_user -d isp_customers"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: isp-customers-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/isp_customers
+      DB_USER: isp_user
+      DB_PASSWORD: isp_pass
+    ports:
+      - "8080:8080"
+
+volumes:
+  isp-customers-data:
